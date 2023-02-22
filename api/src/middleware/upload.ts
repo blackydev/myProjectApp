@@ -1,33 +1,11 @@
-import { Request } from "express";
-import multer from "multer";
+import avatarMulter from "./upload/multer.avatar.js";
+import errorHandler from "./upload/errorHandler.js";
+import { convertAvatar, convertPostImgs } from "./upload/convert.js";
+import postMulter from "./upload/multer.post.js";
 
-const fileMaxSize = 1024 * 1024 * 20;
-
-const storage = multer.memoryStorage();
-
-const fileFilter = (
-  req: Request,
-  file: Express.Multer.File,
-  cb: multer.FileFilterCallback
-) => {
-  let size;
-  const contentLength = req.headers["content-length"];
-  if (typeof contentLength === "string") size = parseInt(contentLength);
-  else size = 0;
-
-  if (
-    file.mimetype === "image/jpeg" ||
-    file.mimetype === "image/png" ||
-    file.mimetype === "image/webp"
-  )
-    if (fileMaxSize >= size) return cb(null, true);
-
-  return cb(null, false);
+const upload = {
+  avatar: [avatarMulter.single("avatar"), errorHandler, convertAvatar],
+  post: [postMulter.array("images"), errorHandler, convertPostImgs],
 };
-
-const upload = multer({
-  storage,
-  fileFilter,
-});
 
 export default upload;

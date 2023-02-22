@@ -6,9 +6,10 @@
     "sourceMap": true,
     "outDir": "dist",
     "esModuleInterop": true,
-    "allowUnreachableCode": false,
+    // "allowUnreachableCode": false,
     "noImplicitAny": true,
-    "strict": true
+    "strict": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
   "include": ["./src"],
   "exclude": ["node_modules"]

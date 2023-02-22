@@ -1,5 +1,4 @@
 import { createLogger, transports, format } from "winston";
-import "express-async-errors";
 
 let logger = createLogger({
   transports: [
@@ -25,7 +24,6 @@ let logger = createLogger({
     }),
     new transports.File({ filename: "./logs/exceptions.log" }),
   ],
-  exitOnError: true,
 });
 
 if (process.env.NODE_ENV === "test")
@@ -33,7 +31,7 @@ if (process.env.NODE_ENV === "test")
     transports: [
       new transports.File({
         filename: "./logs/logfile.log",
-        format: format.combine(format.json()),
+        format: format.combine(format.timestamp(), format.json()),
       }),
     ],
     exceptionHandlers: [
@@ -46,7 +44,6 @@ if (process.env.NODE_ENV === "test")
       }),
       new transports.File({ filename: "./logs/exceptions.log" }),
     ],
-    exitOnError: true,
   });
 
 export default logger;

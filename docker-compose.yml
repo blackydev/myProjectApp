@@ -13,7 +13,6 @@ services:
     image: my-social-app-api
     volumes:
       - ./api/src:/app/src
-      - ./api/logs/tests:/app/logs
       - ./api/coverage:/app/coverage
     command: npm test
 

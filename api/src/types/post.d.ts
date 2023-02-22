@@ -1,14 +1,17 @@
-import mongoose from "mongoose";
-import User from "./user.js";
-export interface Post {
-  author: User | mongoose.ObjectId;
+import mongoose, { Document, Model } from "mongoose";
+import { IUserDocument } from "./user.js";
+
+export interface IPostDocument extends Document {
+  author: IUserDocument | mongoose.ObjectId;
   content: string;
-  likes: [User | mongoose.ObjectId];
+  likes: [IUserDocument | mongoose.ObjectId];
   likesCount: Number;
   createdAt: Date;
   media?: [Buffer];
-  parent: Post | mongoose.ObjectId;
-  answers: [Post | mongoose.ObjectId];
+  parent: IUserDocument | mongoose.ObjectId;
 }
 
-export default Post;
+export interface IPostModel extends Model<IPostDocument> {
+  addLike(postId: string, userId: string): Promise<IPostDocument>;
+  deleteLike(postId: string, userId: string): Promise<IPostDocument>;
+}

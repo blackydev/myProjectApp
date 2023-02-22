@@ -1,17 +1,33 @@
-import { Document } from "mongoose";
-import Post from "./post.js";
-
-interface User extends Document {
+import mongoose, { Document, Model } from "mongoose";
+import Permissions from "../utils/permisions.ts";
+export interface IUserDocument extends Document {
   email: string;
   password: string;
   name: string;
   avatar: Buffer;
-  posts: [Post];
+  permissions: Permissions;
+  followed: [IUserDocument | mongoose.ObjectId];
+  followedCount: Number;
+  followers: [IUserDocument | mongoose.ObjectId];
+  followersCount: Number;
 
   toJSON(): any;
-  setPassword(password: string): Promise<Error | undefined>;
   comparePassword(password: string): Promise<boolean & void>;
   generateAuthToken: () => string;
 }
+export interface IUserModel extends Model<IUserDocument> {
+  setPassword(
+    userId: string | mongoose.Types.ObjectId,
+    password: string
+  ): Promise<IUserDocument | Error>;
 
-export default User;
+  follow(
+    followerId: IUserDocument,
+    followedId: IUserDocument
+  ): Promise<IUserDocument | null>;
+
+  unfollow(
+    followerId: IUserDocument,
+    followedId: IUserDocument
+  ): Promise<IUserDocument | null>;
+}

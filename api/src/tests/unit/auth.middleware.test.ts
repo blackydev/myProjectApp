@@ -4,7 +4,7 @@ import auth from "../../middleware/auth.js";
 import { User } from "../../models/user.js";
 const app: Express = express();
 app.get("/", auth, (req: Request, res: Response) => {
-  res.send(res.locals.user);
+  res.send(req.user);
 });
 const server = app.listen();
 

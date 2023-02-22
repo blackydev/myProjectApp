@@ -12,8 +12,12 @@ describe("auth's route", () => {
       email: "auth@example.com",
       name: "user",
     });
-    await user.setPassword("Password123");
     await user.save();
+    await User.setPassword(user._id, "Password123");
+  });
+
+  afterEach(async () => {
+    await User.deleteMany({});
   });
 
   afterAll(async () => {
