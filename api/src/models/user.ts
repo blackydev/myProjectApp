@@ -38,31 +38,31 @@ const UserSchema = new Schema<IUserDocument>({
     type: [Schema.Types.ObjectId],
     ref: "user",
     validate: [
-      (val: Array<Schema.Types.ObjectId>) => val.length <= 1001,
-      "User following too many users.",
+      (arr: Array<Schema.Types.ObjectId>) => arr.length <= 1001,
+      "User is following too many users.",
     ],
   },
 
-  followers: [
-    {
-      ref: "user",
-      type: Schema.Types.ObjectId,
-    },
-  ],
+  followedCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
+
+  followersCount: {
+    type: Number,
+    default: 0,
+    min: 0,
+  },
 
   permissions: {
     type: Number,
   },
-});
 
-UserSchema.set("toJSON", { virtuals: true });
-
-UserSchema.virtual("followedCount").get(function () {
-  return this.followed.length | 0;
-});
-
-UserSchema.virtual("followersCount").get(function () {
-  return this.followers.length | 0;
+  chats: {
+    type: [Schema.Types.ObjectId],
+    ref: "chat",
+  },
 });
 
 UserSchema.statics = {
@@ -81,59 +81,6 @@ UserSchema.statics = {
       { password: hashed },
       { new: true }
     );
-  },
-
-  follow: async function (
-    followerId: IUserDocument,
-    followedId: IUserDocument
-  ): Promise<IUserDocument | null> {
-    const followed = await this.findByIdAndUpdate(
-      followedId,
-      {
-        $addToSet: { followers: followerId },
-      },
-      { new: true }
-    );
-    if (!followed) return null;
-
-    const follower = await this.findByIdAndUpdate(
-      followerId,
-      {
-        $addToSet: { followed: followedId },
-      },
-      { new: true }
-    );
-    if (!follower) {
-      await this.findByIdAndUpdate(followedId, {
-        $pull: { followers: followerId },
-      });
-      return null;
-    }
-
-    return follower;
-  },
-
-  unfollow: async function (
-    followerId: IUserDocument,
-    followedId: IUserDocument
-  ): Promise<IUserDocument | null> {
-    await this.findByIdAndUpdate(
-      followedId,
-      {
-        $pull: { followers: followerId },
-      },
-      { new: true }
-    );
-
-    const follower = await this.findByIdAndUpdate(
-      followerId,
-      {
-        $pull: { followed: followerId },
-      },
-      { new: true }
-    );
-
-    return follower;
   },
 };
 

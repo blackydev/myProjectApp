@@ -162,4 +162,60 @@ router.delete(
   }
 );
 
+router.patch(
+  "/:id/follow",
+  [validateObjectId, auth],
+  async (req: Request, res: Response) => {
+    const followerId = req.user._id;
+    const followedId = req.params.id;
+
+    const follower = await User.findOne({
+      _id: followerId,
+      followed: { $nin: followedId },
+    });
+    if (!follower) return res.status(400).send("You follow this user.");
+
+    const followed = await User.findByIdAndUpdate(followedId, {
+      $inc: { followersCount: 1 },
+    });
+    if (!followed)
+      return res.status(404).send("User with given ID does not exist.");
+
+    await follower.update({
+      $push: { followed: followedId },
+      $inc: { followedCount: 1 },
+    });
+
+    res.status(204).send();
+  }
+);
+
+router.patch(
+  "/:id/unfollow",
+  [validateObjectId, auth],
+  async (req: Request, res: Response) => {
+    const followerId = req.user._id;
+    const followedId = req.params.id;
+
+    const follower = await User.findOne({
+      _id: followerId,
+      followed: { $in: followedId },
+    });
+    if (!follower) return res.status(400).send("You do not follow this user.");
+
+    await follower.update({
+      $pull: { followed: followedId },
+      $inc: { followedCount: -1 },
+    });
+
+    const followed = await User.findByIdAndUpdate(followedId, {
+      $inc: { followersCount: -1 },
+    });
+    if (!followed)
+      return res.status(404).send("User with given ID does not exist.");
+
+    res.status(204).send();
+  }
+);
+
 export default router;

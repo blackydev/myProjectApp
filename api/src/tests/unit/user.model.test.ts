@@ -20,8 +20,6 @@ describe("user's model", () => {
     expect(user).toHaveProperty("followed");
     expect(Array.isArray(user.followed)).toBeTruthy();
     expect(user).toHaveProperty("followersCount", 0);
-    expect(user).toHaveProperty("followers");
-    expect(Array.isArray(user.followers)).toBeTruthy();
     expect(user).toHaveProperty("followersCount", 0);
   });
 
@@ -245,62 +243,6 @@ describe("user's model", () => {
         const password = "Password with spaces 123";
         const error = await User.setPassword(userId, password);
         expect(error).toBeTruthy();
-      });
-    });
-
-    describe("follow", () => {
-      let follower: IUserDocument, followed: IUserDocument;
-
-      beforeEach(async () => {
-        follower = new User({
-          email: "follower@example.com",
-          name: "follower",
-        });
-        await follower.save();
-
-        followed = new User({
-          email: "followed@example.com",
-          name: "followed",
-        });
-        await followed.save();
-      });
-
-      it("should follow user", async () => {
-        let user = await User.follow(follower._id, followed._id);
-        user = await User.follow(follower._id, followed._id);
-        expect(user).toHaveProperty("_id", follower._id);
-        expect(user?.followed.length).toBe(1);
-        expect(user?.followed[0].toString()).toBe(followed._id.toString());
-
-        user = await User.findById(follower._id);
-        expect(user).toBeTruthy();
-        expect(user?.followed.length).toBe(1);
-        expect(user?.followed[0].toString()).toBe(followed._id.toString());
-
-        user = await User.findById(followed._id);
-        expect(user).toBeTruthy();
-        expect(user?.followers.length).toBe(1);
-        expect(user?.followers[0].toString()).toBe(follower._id.toString());
-      });
-
-      it("should do not follow user if follower does not exist", async () => {
-        await User.findByIdAndDelete(follower._id);
-        let user = await User.follow(follower._id, followed._id);
-        expect(user).toBe(null);
-
-        user = await User.findById(followed._id);
-        expect(user).toBeTruthy();
-        expect(user?.followers.length).toBe(0);
-      });
-
-      it("should do not follow user if followed user does not exist", async () => {
-        await User.findByIdAndDelete(followed._id);
-        let user = await User.follow(follower._id, followed._id);
-        expect(user).toBe(null);
-
-        user = await User.findById(follower._id);
-        expect(user).toBeTruthy();
-        expect(user?.followed.length).toBe(0);
       });
     });
   });

@@ -16,7 +16,7 @@ describe("posts' route", () => {
 
   beforeEach(async () => {
     user = new User({
-      email: "auth@example.com",
+      email: "user1@example.com",
       name: "user",
     });
     await user.save();
@@ -213,7 +213,7 @@ describe("posts' route", () => {
     });
 
     it("should return 404 if post with given ID does not exist", async () => {
-      await Post.remove({});
+      await Post.deleteMany({});
       await exec().expect(404);
     });
 

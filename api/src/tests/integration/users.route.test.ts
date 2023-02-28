@@ -8,6 +8,7 @@ import { User } from "../../models/user.js";
 import path from "path";
 import Permissions from "../../utils/permisions.js";
 import { Post } from "../../models/post.js";
+import { IUserDocument } from "../../types/user.js";
 
 const endpoint: string = "/api/users/";
 
@@ -521,6 +522,134 @@ describe("users' route", () => {
       await User.deleteMany({});
       const { status } = await exec();
       expect(status).toBe(404);
+    });
+  });
+
+  describe("PATCH /:id/follow", () => {
+    let followerId: string, followedId: string, token: string;
+    beforeEach(async () => {
+      const followed = new User({
+        email: "followed@example.com",
+        name: "user",
+      });
+      await followed.save();
+      const follower = await createExampleUser();
+
+      followerId = follower._id.toString();
+      followedId = followed._id.toString();
+      token = follower.generateAuthToken();
+    });
+
+    const exec = () =>
+      request(server)
+        .patch(path.join(endpoint, followedId, "/follow"))
+        .set("x-auth-token", token);
+
+    it("should return 204 and change users", async () => {
+      await exec().expect(204);
+
+      let user = await User.findById(followerId);
+      expect(user).toBeTruthy();
+      expect(user?.followed.length).toBe(1);
+      expect(user?.followedCount).toBe(1);
+      expect(user?.followed[0].toString()).toBe(followedId.toString());
+
+      user = await User.findById(followedId);
+      expect(user).toBeTruthy();
+      expect(user?.followersCount).toBe(1);
+    });
+
+    it("should return 404 and do not update user if followed user does not exist", async () => {
+      await User.findByIdAndDelete(followedId);
+      await exec().expect(404);
+
+      const user = await User.findById(followerId);
+      expect(user).toBeTruthy();
+      expect(user?.followed.length).toBe(0);
+      expect(user?.followedCount).toBe(0);
+    });
+
+    it("should return 400 if user already follow this user", async () => {
+      await User.findByIdAndUpdate(followerId, {
+        followed: [followedId],
+        followedCount: 1,
+      });
+      await exec().expect(400);
+
+      const user = await User.findById(followedId);
+      expect(user).toBeTruthy();
+      expect(user?.followersCount).toBe(0);
+    });
+  });
+
+  describe("PATCH /:id/unfollow", () => {
+    let followerId: string, followedId: string, token: string;
+    beforeEach(async () => {
+      const followed = new User({
+        email: "followed@example.com",
+        name: "user",
+        followersCount: 1,
+      });
+      await followed.save();
+      followedId = followed._id.toString();
+
+      const follower = new User({
+        email: "follower@example.com",
+        name: "follower",
+        followed: [followedId],
+        followedCount: 1,
+      });
+      followerId = follower._id.toString();
+
+      await follower.save();
+      token = follower.generateAuthToken();
+    });
+
+    const exec = () =>
+      request(server)
+        .patch(path.join(endpoint, followedId.toString(), "/unfollow"))
+        .set("x-auth-token", token);
+
+    it("should return 204 and change users", async () => {
+      await exec().expect(204);
+      await exec();
+
+      let user = await User.findById(followerId);
+      expect(user).toBeTruthy();
+      expect(user?.followed.length).toBe(0);
+      expect(user?.followedCount).toBe(0);
+
+      user = await User.findById(followedId);
+      expect(user?.followersCount).toBe(0);
+    });
+
+    it("should return 404 and change users if followed user does not exist", async () => {
+      await User.findByIdAndDelete(followedId);
+      await exec().expect(404);
+
+      const user = await User.findById(followerId);
+      expect(user).toBeTruthy();
+      expect(user?.followed.length).toBe(0);
+      expect(user?.followedCount).toBe(0);
+    });
+
+    it("should return 400 and user already does not follow this user", async () => {
+      await User.updateMany({
+        followed: [],
+        followedCount: 0,
+        followersCount: 0,
+      });
+
+      await exec().expect(400);
+
+      let user = await User.findById(followerId);
+      expect(user).toBeTruthy();
+      expect(user?.followed.length).toBe(0);
+      expect(user?.followedCount).toBe(0);
+
+      user = await User.findById(followedId);
+      expect(user).toBeTruthy();
+      expect(user?.followersCount).toBe(0);
     });
   });
 });

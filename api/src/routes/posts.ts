@@ -5,7 +5,7 @@ import auth from "../middleware/auth.js";
 import upload from "../middleware/upload.js";
 import validateObjectId from "../middleware/validateObjectId.js";
 import perms from "../middleware/perms.js";
-import { IPostDocument } from "../types/post.js";
+import { IPostDocument, IPostModel } from "../types/post.js";
 const router = express.Router();
 
 router.post(
@@ -50,6 +50,7 @@ router.patch(
         .send("You have to send like property which is boolean.");
 
     let post: IPostDocument;
+
     if (req.body.like) post = await Post.addLike(req.params.id, req.user._id);
     else post = await Post.deleteLike(req.params.id, req.user._id);
 
