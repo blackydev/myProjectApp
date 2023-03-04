@@ -213,10 +213,10 @@ describe("users' route", () => {
         expect(text).toBe('"email" must be a valid email');
       });
 
-      it("Should return 400 status if user already exists", async () => {
+      it("Should return 409 status if user already exists", async () => {
         await exec();
-        const { status, text } = await exec();
-        expect(status).toBe(400);
+        const { status } = await exec();
+        expect(status).toBe(409);
       });
     });
   });

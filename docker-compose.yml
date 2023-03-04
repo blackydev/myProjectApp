@@ -1,13 +1,25 @@
 version: "3.8"
 services:
+  web:
+    build: ./web
+    ports:
+      - 3000:5173
+    volumes:
+      - ./web/src:/app/src
+    environment:
+      - PORT=3000
+      - VITE_API_IP=http://localhost:4000
+
   api:
     build: ./api
     ports:
       - 4000:3000
     volumes:
       - ./api/src:/app/src
-      - ./types:/app/src
       - ./api/logs/dev:/app/logs
+    environment:
+      - app_webIP=http://localhost:3000
+
 
   api-tests:
     image: my-social-app-api
@@ -19,7 +31,7 @@ services:
   db:
     image: mongo:4.0.28-xenial
     ports:
-      - 27017:27017
+      - 27016:27017
     volumes:
       - social-app:/data/db
 

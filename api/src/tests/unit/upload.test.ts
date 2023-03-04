@@ -36,8 +36,8 @@ describe("upload middleware", () => {
       expect(Buffer.isBuffer(res.body)).toBeTruthy();
 
       const data = await sharp(res.body).metadata();
-      expect(data.width).toBe(350);
-      expect(data.height).toBe(350);
+      expect(data.width).toBe(128);
+      expect(data.height).toBe(128);
       expect(data.format).toBe("webp");
     };
 

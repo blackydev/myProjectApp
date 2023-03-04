@@ -1,4 +1,5 @@
 {
   "db": "",
-  "jwtPrivateKey": ""
+  "jwtPrivateKey": "",
+  "webIP": ""
 }

@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.get("/:id", validateObjectId, async (req: Request, res: Response) => {
   const user = await User.findById(req.params.id).select(
-    "name followedCount followersCount"
+    "name followedCount followersCount",
   );
   if (!user)
     return res.status(404).send("User with the given ID does not exist.");
@@ -38,7 +38,7 @@ router.get(
     if (!posts.length) return res.status(404).send("Posts' page is empty.");
 
     res.send(posts);
-  }
+  },
 );
 
 router.post("/", async (req: Request, res: Response) => {
@@ -50,7 +50,7 @@ router.post("/", async (req: Request, res: Response) => {
   let user = await User.findOne({ email: body.email });
   if (user)
     return res
-      .status(400)
+      .status(409)
       .send("User with the specified email address already exists.");
 
   user = new User({ ...body, password: undefined });
@@ -80,7 +80,7 @@ router.patch(
         email: body.email,
         name: body.name,
       },
-      { new: true }
+      { new: true },
     );
     if (!user)
       return res
@@ -92,7 +92,7 @@ router.patch(
 
     const token = user.generateAuthToken();
     res.send(token);
-  }
+  },
 );
 
 router.patch(
@@ -113,7 +113,7 @@ router.patch(
     await user.save();
 
     res.status(204).send();
-  }
+  },
 );
 
 router.get(
@@ -127,7 +127,7 @@ router.get(
     if (!user.avatar) return res.status(204).send();
 
     res.send(user.avatar);
-  }
+  },
 );
 
 router.patch(
@@ -141,7 +141,7 @@ router.patch(
       return res.status(404).send("User with the given ID does not exist.");
 
     res.status(204).send();
-  }
+  },
 );
 
 router.delete(
@@ -153,13 +153,13 @@ router.delete(
       {
         $unset: { avatar: true },
       },
-      { new: true }
+      { new: true },
     );
     if (!user)
       return res.status(404).send("User with the given ID does not exist.");
 
     res.status(204).send();
-  }
+  },
 );
 
 router.patch(
@@ -187,7 +187,7 @@ router.patch(
     });
 
     res.status(204).send();
-  }
+  },
 );
 
 router.patch(
@@ -215,7 +215,7 @@ router.patch(
       return res.status(404).send("User with given ID does not exist.");
 
     res.status(204).send();
-  }
+  },
 );
 
 export default router;

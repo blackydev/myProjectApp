@@ -9,7 +9,7 @@ export const convertAvatar = async (
   if (!req.file) return res.status(400).send("File is required.");
 
   req.file.buffer = await sharp(req.file.buffer)
-    .resize({ width: 350, height: 350 })
+    .resize({ width: 128, height: 128 })
     .webp()
     .toBuffer();
 

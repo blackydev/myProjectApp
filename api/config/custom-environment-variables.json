@@ -1,4 +1,5 @@
 {
   "db": "app_db",
-  "jwtPrivateKey": "app_jwtPrivateKey"
+  "jwtPrivateKey": "app_jwtPrivateKey",
+  "webIP": "app_webIP"
 }

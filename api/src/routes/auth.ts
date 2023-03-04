@@ -13,8 +13,7 @@ router.post("/", async (req: Request, res: Response) => {
   if (!user) return res.status(400).send("Invalid email or password.");
 
   const compare = await user.comparePassword(body.password);
-  if (!compare)
-    return res.status(400).send("Invalid email or password password.");
+  if (!compare) return res.status(400).send("Invalid email or password.");
 
   const token = user.generateAuthToken();
   res.send(token);

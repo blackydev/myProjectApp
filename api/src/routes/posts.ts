@@ -5,8 +5,12 @@ import auth from "../middleware/auth.js";
 import upload from "../middleware/upload.js";
 import validateObjectId from "../middleware/validateObjectId.js";
 import perms from "../middleware/perms.js";
-import { IPostDocument, IPostModel } from "../types/post.js";
+import { IPostDocument } from "../types/post.js";
 const router = express.Router();
+
+router.get("/", async (req: Request, res: Response) => {
+  // INNNNNNN PROGRESS :)
+});
 
 router.post(
   "/",
@@ -37,7 +41,7 @@ router.post(
     await post.save();
 
     res.send(post);
-  }
+  },
 );
 
 router.patch(
@@ -58,11 +62,11 @@ router.patch(
       return res
         .status(400)
         .send(
-          "Post with given ID does not exist or user already liked this post."
+          "Post with given ID does not exist or user already liked this post.",
         );
 
     res.status(204).send();
-  }
+  },
 );
 
 router.delete(
@@ -71,7 +75,7 @@ router.delete(
   async (req: Request, res: Response) => {
     await Post.findByIdAndDelete(req.params.id);
     res.status(204).send();
-  }
+  },
 );
 
 export default router;
