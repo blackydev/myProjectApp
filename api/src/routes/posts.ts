@@ -9,7 +9,11 @@ import { IPostDocument } from "../types/post.js";
 const router = express.Router();
 
 router.get("/", async (req: Request, res: Response) => {
-  // INNNNNNN PROGRESS :)
+  //TODO: change it (fast implementation for creating web)
+  const posts = await Post.find({}).select(
+    "content parent likesCount createdAt",
+  );
+  res.send(posts);
 });
 
 router.post(

@@ -2,8 +2,7 @@ import * as React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AppBar, Box, Toolbar, Typography, IconButton, MenuItem, Menu, Avatar} from '@mui/material';
 import authService from '../service/auth';
-import { Grid } from '@mui/material';
-import userService from '../service/users';
+import UserAvatar from './utils/userAvatar';
 
 const MenuBar = ()=> {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -25,8 +24,8 @@ const MenuBar = ()=> {
   }
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+    <Box sx={{ flexGrow: 1}}>
+      <AppBar position="static" elevation={12}>
         <Toolbar>       
            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             <Link to="/"  style={{textDecoration: "none", color: "white"}}>
@@ -42,7 +41,7 @@ const MenuBar = ()=> {
                 onClick={handleMenu}
                 color="inherit"
               >
-                <Avatar alt={user?.name} src={user && userService.getAvatarURL(user._id) || ""} />
+                {user && <UserAvatar id={user._id} name={user.name}/>}
                 </IconButton>
               <Menu
                 id="menu-appbar"
@@ -61,14 +60,19 @@ const MenuBar = ()=> {
                 sx={{            
                   display: 'flex',
                   flexDirection: 'column',
+                  alignItems: "center"
                 }}
               >
-                <Grid> 
-                  <Avatar alt={user?.name} src="/static/images/avatar/1.jpg" sx={{marginX: "auto", mb: 1}} />
+                  <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: "center"
+                  }}>
+                    {user && <UserAvatar id={user._id} name={user.name}/>}
+                  </Box>
                   <MenuItem onClick={handleClose}> <Link to={"/users/" + user?._id}>  Profile </Link> </MenuItem>
                   <MenuItem onClick={handleClose}>  <Link to="/account"> My account </Link> </MenuItem>
                   <MenuItem onClick={handleLogOut}>Log out</MenuItem>
-                </Grid>             
               </Menu>
             </div>
         </Toolbar>

@@ -1,67 +1,72 @@
+import {useNavigate} from "react-router-dom"
 import { useState } from 'react';
 import * as Yup from "yup";
 import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
-import { Button, Box, TextField, Typography, Avatar, Container } from "@mui/material";
-import PasswordIcon from '@mui/icons-material/Password';
+import authService from '../../service/auth';
+import { Button, Box, Typography,Avatar } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
 import DoneIcon from '@mui/icons-material/Done';
 import userSchemas from "./user.schemas";
 import userService from "../../service/users";
-import { useNavigate } from 'react-router-dom';
-import authService from '../../service/auth';
 import TextInput from '../utils/Input';
 
-const UpdateSchema = Yup.object().shape({
-    password: userSchemas.password,
+const validationSchema = Yup.object().shape({
+    email: userSchemas.email,
+    name: userSchemas.name,
  });
 
-const UpdatePasswordForm = () => {
+const SetUserForm = () => {
   const [success, setSuccess] = useState(false);
 
   const navigate = useNavigate();
   const user = authService.getUser();
-  if(!user) return navigate("/login");
+  if(!user) {
+    navigate("/login");
+    return null;
+  }
 
-  const formik = useFormik<{password:string}>({
-    initialValues: { password: "" },
-    validationSchema: UpdateSchema,
-    onSubmit: async ({password}) => {
+  const formik = useFormik<{email:string, name: string}>({
+    initialValues: { email: user.email, name: user.name },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
       try {
-        await userService.changePassword(user._id, password);
+        const {data: token} = await userService.change(user._id, values);
+        authService.setJwt(token);
         setSuccess(true);
       } catch(ex) {
         const error = ex as AxiosError;
-        if(error.response?.status === 400) formik.errors.password = error.response.data as string;
+        if(error.response?.status === 400) formik.errors.email = error.response.data as string;
       }
     },
   });
-
-  const handleFormik = formik.handleChange;
-  formik.handleChange = (e: any) => {
+  
+  const handleChange = (e: any) => {
     if(success) setSuccess(false);
-    handleFormik(e);
+    formik.handleChange(e);
   }
 
-
     return (
-       <Container maxWidth="sm">
         <Box
           sx={{
-             display: 'flex',
+            display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
           }}
         >
-           <Avatar sx={{ m: 1, bgcolor: (success) ? "success.main" : "primary.main" }} >
+          <Avatar sx={{ m: 1, bgcolor: (success) ? "success.main" : "primary.main" }} >
             {success && <DoneIcon/>} 
-            {!success && <PasswordIcon/>}
+            {!success && <EditIcon/>}
           </Avatar>
-     
+
           <Typography component="h2" variant="h5">
-            Password
+            User
           </Typography>
-          <Box component="form" onSubmit={formik.handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextInput label="Password" name="password" type="password" formik={formik}  />
+          <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 1 }}>
+
+            <TextInput label="Email" name="email" formik={formik} onChange={handleChange}  />
+            <TextInput label="Name" name="name" formik={formik} onChange={handleChange}  />
+
             {         
             (!success) && 
             <Button
@@ -70,7 +75,7 @@ const UpdatePasswordForm = () => {
               variant="contained"
               sx={{ mt: 2 }}
             >
-             Set Password
+             Update Account
             </Button>}
 
             {
@@ -87,8 +92,7 @@ const UpdatePasswordForm = () => {
 
           </Box>
         </Box>
-      </Container>
   );
 };
 
-export default UpdatePasswordForm;
+export default SetUserForm;

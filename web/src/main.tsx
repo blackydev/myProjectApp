@@ -10,7 +10,7 @@ const theme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-    main: purple[500],
+    main: purple[400],
     },
     secondary: {
       main: grey[900],

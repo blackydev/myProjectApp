@@ -3,8 +3,8 @@ import Home, {loader as homeLoader}  from './routes/home';
 import Layout from './routes/layout';
 import Account from './routes/account';
 import { signLoader } from "./routes/sign";
-import SignupForm from "./components/account/signupForm";
-import LoginForm from "./components/account/loginForm";
+import SignupForm from "./components/accountForms/signupForm";
+import LoginForm from "./components/accountForms/loginForm";
 import Profile from "./routes/profile";
 
 const router = createBrowserRouter([

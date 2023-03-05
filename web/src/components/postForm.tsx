@@ -1,11 +1,12 @@
 import * as Yup from "yup";
 import { AxiosError } from 'axios';
 import { useFormik } from 'formik';
-import { TextField, Avatar, Paper, Button, Box } from "@mui/material";
+import { TextField, Avatar, Paper, IconButton, Box } from "@mui/material";
 import postService from "../service/posts";
 import authService from "../service/auth";
-import userService from "../service/users";
+import SendIcon from '@mui/icons-material/Send';
 import { Link } from 'react-router-dom';
+import UserAvatar from "./utils/userAvatar";
 
 const validationSchema = Yup.object().shape({
     content: Yup.string().min(2).max(1000).required(),
@@ -31,34 +32,35 @@ const PostForm = ({parent, pushToWall}: {parent?: string, pushToWall(post: unkno
         <Paper elevation={12} sx={{my: 2, pb: 1}} component="form" onSubmit={formik.handleSubmit}>
         <Box sx={{ display: "flex", alignItems: "center", p: 2 }}>
         <Link to={"/users/" + user?._id}>
-          <Avatar 
-            alt={user?.name} src={userService.getAvatarURL(user?._id)} 
-            sx={{ width: 32, height: 32, fontSize: "1rem", mr: 1 }}
-              />
+            <Box
+            sx={{ width: 32, height: 32, fontSize: "1rem", mr: 2 }}
+             >
+                {user && <UserAvatar id={user._id} name={user.name}/>}
+            </Box>
         </Link>
-            <TextField
-            name="content"
-            label="new post"
-            variant="standard"
-            InputLabelProps={{
-                shrink: true,
-            }}
-            maxRows="2"
-            multiline
-            fullWidth
-            value={formik.values.content}
-            onChange={formik.handleChange}
-            error={formik.touched.content && Boolean(formik.errors.content)}
-            />
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center"}}>
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{mx: "auto"}}
+        <TextField
+        name="content"
+        label="new post"
+        variant="standard"
+        InputLabelProps={{
+            shrink: true,
+        }}
+        maxRows="2"
+        multiline
+        fullWidth
+        value={formik.values.content}
+        onChange={formik.handleChange}
+        error={formik.touched.content && Boolean(formik.errors.content)}
+         helperText={formik.touched.content && formik.errors.content}
+        />
+        <IconButton
+        component="button"
+        type="submit"
+        sx={{ml: 1}}
             >
-             Post it
-            </Button>
+            <SendIcon sx={{color: "primary.main"}}/>
+        </IconButton>
+
         </Box>
         </Paper>
     )

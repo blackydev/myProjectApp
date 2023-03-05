@@ -28,18 +28,6 @@ const LoginForm = () => {
       }
     },})
 
-      const inputs = [
-    {
-      label: "Email",
-      name: "email",
-    }, 
-    {
-      label: "Name",
-      name: "name",
-    }
-  ]
-
-
     return (
   <Container maxWidth="sm">
         <Box

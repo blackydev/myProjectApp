@@ -68,7 +68,7 @@ const UserSchema = new Schema<IUserDocument>({
 UserSchema.statics = {
   setPassword: async function (
     userId: string | mongoose.Types.ObjectId,
-    password: string
+    password: string,
   ): Promise<IUserDocument | Error> {
     const errors = validatePassword(password);
     if (Array.isArray(errors) && errors.length > 0)
@@ -79,7 +79,7 @@ UserSchema.statics = {
     return await this.findByIdAndUpdate(
       userId,
       { password: hashed },
-      { new: true }
+      { new: true },
     );
   },
 };
@@ -103,14 +103,14 @@ UserSchema.methods = {
         name: this.name,
         permissions: this.permissions,
       },
-      config.get("jwtPrivateKey")
+      config.get("jwtPrivateKey"),
     );
   },
 };
 
 export const User = mongoose.model<IUserDocument, IUserModel>(
   "user",
-  UserSchema
+  UserSchema,
 );
 
 export const validate = validateUser;

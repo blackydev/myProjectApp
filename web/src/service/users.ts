@@ -1,4 +1,3 @@
-import authService from "./auth";
 import http from "./http";
 import joinURL from "url-join";
 const endpoint = "users/";
@@ -38,19 +37,23 @@ const change = (
 const changePassword = (userId: string, newPassword: string) =>
   http.patch(joinURL(endpoint, userId, "/password"), { password: newPassword });
 
-const changeAvatar = (userId: string, avatar: Buffer) =>
-  http.patch(joinURL(endpoint, userId, "/avatar"), avatar);
+const changeAvatar = (userId: string, file: File) => {
+  const data = new FormData();
+  data.append("avatar", file);
+  return http.patch(joinURL(endpoint, userId, "/avatar"), data);
+};
 
 const deleteAvatar = (userId: string) =>
   http.delete(joinURL(endpoint, userId, "/avatar"));
 
 const follow = (userId: string) =>
   http.patch(joinURL(endpoint, userId, "follow"));
+
 const unfollow = (userId: string) =>
   http.patch(joinURL(endpoint, userId, "unfollow"));
 
 const getAvatarURL = (userId?: string) => {
-  return userId ? joinURL(http.apiEndpoint, userId, "/avatar") : "";
+  return userId ? joinURL(http.apiEndpoint, endpoint, userId, "/avatar") : "";
 };
 
 const userService = {
